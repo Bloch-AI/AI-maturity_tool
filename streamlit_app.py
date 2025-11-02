@@ -5,7 +5,7 @@ import pandas as pd
 # Page configuration
 st.set_page_config(
     page_title="AI Feasibility Assessment",
-    page_icon="🎯",
+    page_icon="📊",
     layout="wide"
 )
 
@@ -25,17 +25,30 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
-    .dimension-box {
-        background-color: #f0f8ff;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid #1e3a5f;
+    .dimension-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #1e3a5f;
+        margin-bottom: 0.5rem;
     }
-    .score-description {
-        font-size: 0.9rem;
+    .dimension-description {
+        font-size: 0.95rem;
         color: #555;
-        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .score-criteria {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+    .score-item {
+        padding: 0.3rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .score-item:last-child {
+        border-bottom: none;
     }
     .result-box {
         padding: 2rem;
@@ -71,133 +84,150 @@ if 'scores' not in st.session_state:
 # Create columns for the assessment
 col1, col2 = st.columns(2)
 
-# Define scoring descriptions
+# Define scoring descriptions with all criteria
 dimensions = {
     'Technical Feasibility': {
         'description': 'Assesses whether required technology and tools are readily available and within the team\'s current capability.',
-        'score_1': 'Requires specialist systems or significant new technical skills',
-        'score_3': 'Achievable with some learning or adaptation',
-        'score_5': 'Implementable with accessible tools (ChatGPT, Copilot, n8n)'
+        'scores': {
+            1: 'Requires specialist systems or significant new technical skills',
+            2: 'Needs substantial learning curve and new tool adoption',
+            3: 'Achievable with some learning or adaptation',
+            4: 'Mostly familiar tools with minor new elements',
+            5: 'Implementable with accessible tools (ChatGPT, Copilot, n8n)'
+        }
     },
     'Business Feasibility': {
         'description': 'Considers alignment with business goals and expected value delivery.',
-        'score_1': 'Interesting concept but limited business relevance or measurable benefit',
-        'score_3': 'Partially aligned to goals with clear value potential',
-        'score_5': 'Directly supports strategic priority with clear ROI potential'
+        'scores': {
+            1: 'Interesting concept but limited business relevance or measurable benefit',
+            2: 'Some potential value but unclear business case',
+            3: 'Partially aligned to goals with clear value potential',
+            4: 'Well-aligned with strategic goals and demonstrable benefits',
+            5: 'Directly supports strategic priority with clear ROI potential'
+        }
     },
     'Resource Feasibility': {
         'description': 'Evaluates whether the team has sufficient time, people, and attention to deliver during the Bootcamp.',
-        'score_1': 'One individual with limited time; other commitments dominate',
-        'score_3': 'Some dedicated time, but delivery may be challenging',
-        'score_5': 'Team of two or more with sufficient time and clear roles'
+        'scores': {
+            1: 'One individual with limited time; other commitments dominate',
+            2: 'Single person with moderate availability',
+            3: 'Some dedicated time, but delivery may be challenging',
+            4: 'Good team availability with mostly clear schedules',
+            5: 'Team of two or more with sufficient time and clear roles'
+        }
     },
     'Data Availability & Quality': {
         'description': 'Evaluates whether required data exists, is accessible, and of usable standard.',
-        'score_1': 'Little relevant data available or poor quality/unstructured data',
-        'score_3': 'Partial access; some data cleaning or preparation required',
-        'score_5': 'Well-structured data readily available for immediate use'
+        'scores': {
+            1: 'Little relevant data available or poor quality/unstructured data',
+            2: 'Limited data requiring significant processing',
+            3: 'Partial access; some data cleaning or preparation required',
+            4: 'Good data availability with minor preparation needed',
+            5: 'Well-structured data readily available for immediate use'
+        }
     }
 }
 
 # Create the assessment form
 with st.form("assessment_form"):
-    st.markdown("### 📊 Rate Each Dimension (1-5)")
+    st.markdown("### Rate Each Dimension (1-5)")
+    st.markdown("---")
     
     scores = {}
     
     # Technical Feasibility
     with col1:
-        st.markdown('<div class="dimension-box">', unsafe_allow_html=True)
-        st.markdown("#### 🔧 Technical Feasibility")
-        st.markdown(f"<p class='score-description'>{dimensions['Technical Feasibility']['description']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-title'>Technical Feasibility</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-description'>{dimensions['Technical Feasibility']['description']}</div>", unsafe_allow_html=True)
         
         technical_score = st.select_slider(
-            "Technical Feasibility Score",
+            "Select score for Technical Feasibility",
             options=[1, 2, 3, 4, 5],
             value=3,
-            format_func=lambda x: f"{x}",
             key="technical",
             label_visibility="collapsed"
         )
         scores['Technical Feasibility'] = technical_score
         
-        if technical_score == 1:
-            st.caption(f"**Score 1:** {dimensions['Technical Feasibility']['score_1']}")
-        elif technical_score == 3:
-            st.caption(f"**Score 3:** {dimensions['Technical Feasibility']['score_3']}")
-        elif technical_score == 5:
-            st.caption(f"**Score 5:** {dimensions['Technical Feasibility']['score_5']}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Show all scoring criteria
+        st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
+        for score, desc in dimensions['Technical Feasibility']['scores'].items():
+            if score == technical_score:
+                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        st.markdown("---")
         
         # Resource Feasibility
-        st.markdown('<div class="dimension-box">', unsafe_allow_html=True)
-        st.markdown("#### 👥 Resource Feasibility")
-        st.markdown(f"<p class='score-description'>{dimensions['Resource Feasibility']['description']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-title'>Resource Feasibility</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-description'>{dimensions['Resource Feasibility']['description']}</div>", unsafe_allow_html=True)
         
         resource_score = st.select_slider(
-            "Resource Feasibility Score",
+            "Select score for Resource Feasibility",
             options=[1, 2, 3, 4, 5],
             value=3,
-            format_func=lambda x: f"{x}",
             key="resource",
             label_visibility="collapsed"
         )
         scores['Resource Feasibility'] = resource_score
         
-        if resource_score == 1:
-            st.caption(f"**Score 1:** {dimensions['Resource Feasibility']['score_1']}")
-        elif resource_score == 3:
-            st.caption(f"**Score 3:** {dimensions['Resource Feasibility']['score_3']}")
-        elif resource_score == 5:
-            st.caption(f"**Score 5:** {dimensions['Resource Feasibility']['score_5']}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Show all scoring criteria
+        st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
+        for score, desc in dimensions['Resource Feasibility']['scores'].items():
+            if score == resource_score:
+                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     # Business Feasibility and Data Quality
     with col2:
-        st.markdown('<div class="dimension-box">', unsafe_allow_html=True)
-        st.markdown("#### 💼 Business Feasibility")
-        st.markdown(f"<p class='score-description'>{dimensions['Business Feasibility']['description']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-title'>Business Feasibility</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-description'>{dimensions['Business Feasibility']['description']}</div>", unsafe_allow_html=True)
         
         business_score = st.select_slider(
-            "Business Feasibility Score",
+            "Select score for Business Feasibility",
             options=[1, 2, 3, 4, 5],
             value=3,
-            format_func=lambda x: f"{x}",
             key="business",
             label_visibility="collapsed"
         )
         scores['Business Feasibility'] = business_score
         
-        if business_score == 1:
-            st.caption(f"**Score 1:** {dimensions['Business Feasibility']['score_1']}")
-        elif business_score == 3:
-            st.caption(f"**Score 3:** {dimensions['Business Feasibility']['score_3']}")
-        elif business_score == 5:
-            st.caption(f"**Score 5:** {dimensions['Business Feasibility']['score_5']}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Show all scoring criteria
+        st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
+        for score, desc in dimensions['Business Feasibility']['scores'].items():
+            if score == business_score:
+                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        st.markdown("---")
         
         # Data Availability & Quality
-        st.markdown('<div class="dimension-box">', unsafe_allow_html=True)
-        st.markdown("#### 📊 Data Availability & Quality")
-        st.markdown(f"<p class='score-description'>{dimensions['Data Availability & Quality']['description']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-title'>Data Availability & Quality</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='dimension-description'>{dimensions['Data Availability & Quality']['description']}</div>", unsafe_allow_html=True)
         
         data_score = st.select_slider(
-            "Data Availability & Quality Score",
+            "Select score for Data Availability & Quality",
             options=[1, 2, 3, 4, 5],
             value=3,
-            format_func=lambda x: f"{x}",
             key="data",
             label_visibility="collapsed"
         )
         scores['Data Availability & Quality'] = data_score
         
-        if data_score == 1:
-            st.caption(f"**Score 1:** {dimensions['Data Availability & Quality']['score_1']}")
-        elif data_score == 3:
-            st.caption(f"**Score 3:** {dimensions['Data Availability & Quality']['score_3']}")
-        elif data_score == 5:
-            st.caption(f"**Score 5:** {dimensions['Data Availability & Quality']['score_5']}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Show all scoring criteria
+        st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
+        for score, desc in dimensions['Data Availability & Quality']['scores'].items():
+            if score == data_score:
+                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     # Submit button
     submitted = st.form_submit_button("Calculate Feasibility Score", type="primary", use_container_width=True)
@@ -214,7 +244,6 @@ if st.session_state.show_results:
     if total_score >= 15:
         category = "High Feasibility"
         category_class = "high-feasibility"
-        category_emoji = "🚀"
         recommendations = [
             "Aim for full feature implementation",
             "Focus on user experience and refinement",
@@ -224,7 +253,6 @@ if st.session_state.show_results:
     elif total_score >= 12:
         category = "Moderate Feasibility"
         category_class = "moderate-feasibility"
-        category_emoji = "⚡"
         recommendations = [
             "Consider reducing initial scope",
             "Identify areas requiring facilitator support",
@@ -234,7 +262,6 @@ if st.session_state.show_results:
     else:
         category = "Prototype Focus"
         category_class = "prototype-focus"
-        category_emoji = "🔬"
         recommendations = [
             "Focus on core concept validation",
             "Create proof-of-concept demonstration",
@@ -244,7 +271,7 @@ if st.session_state.show_results:
     
     # Results section
     st.markdown("---")
-    st.markdown("## 📈 Assessment Results")
+    st.markdown("## Assessment Results")
     
     # Score breakdown
     col_score, col_chart = st.columns([1, 1])
@@ -252,14 +279,14 @@ if st.session_state.show_results:
     with col_score:
         st.markdown(f"""
             <div class="result-box {category_class}">
-                <h2>{category_emoji} {category}</h2>
+                <h2>{category}</h2>
                 <h1 style="font-size: 3rem; margin: 1rem 0;">{total_score}/20</h1>
                 <p>{description}</p>
             </div>
         """, unsafe_allow_html=True)
         
         # Recommendations
-        st.markdown("### 📋 Recommended Actions")
+        st.markdown("### Recommended Actions")
         for rec in recommendations:
             st.markdown(f"• {rec}")
     
@@ -297,7 +324,7 @@ if st.session_state.show_results:
         st.plotly_chart(fig, use_container_width=True)
     
     # Detailed breakdown
-    st.markdown("### 📊 Detailed Score Breakdown")
+    st.markdown("### Detailed Score Breakdown")
     
     df_scores = pd.DataFrame([
         {"Dimension": dim, "Score": score, "Max": 5}
