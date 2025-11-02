@@ -50,6 +50,10 @@ st.markdown("""
     .score-item:last-child {
         border-bottom: none;
     }
+    .score-selected {
+        color: #dc3545;
+        font-weight: bold;
+    }
     .result-box {
         padding: 2rem;
         border-radius: 10px;
@@ -131,6 +135,7 @@ dimensions = {
 # Create the assessment form
 with st.form("assessment_form"):
     st.markdown("### Rate Each Dimension (1-5)")
+    st.info("Score each dimension based on your project's current state. All scoring criteria are shown below each slider to guide your assessment.")
     st.markdown("---")
     
     scores = {}
@@ -153,7 +158,7 @@ with st.form("assessment_form"):
         st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
         for score, desc in dimensions['Technical Feasibility']['scores'].items():
             if score == technical_score:
-                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='score-item score-selected'>Score {score} (Selected): {desc}</div>", unsafe_allow_html=True)
             else:
                 st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -177,7 +182,7 @@ with st.form("assessment_form"):
         st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
         for score, desc in dimensions['Resource Feasibility']['scores'].items():
             if score == resource_score:
-                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='score-item score-selected'>Score {score} (Selected): {desc}</div>", unsafe_allow_html=True)
             else:
                 st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -200,7 +205,7 @@ with st.form("assessment_form"):
         st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
         for score, desc in dimensions['Business Feasibility']['scores'].items():
             if score == business_score:
-                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='score-item score-selected'>Score {score} (Selected): {desc}</div>", unsafe_allow_html=True)
             else:
                 st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -224,10 +229,14 @@ with st.form("assessment_form"):
         st.markdown("<div class='score-criteria'>", unsafe_allow_html=True)
         for score, desc in dimensions['Data Availability & Quality']['scores'].items():
             if score == data_score:
-                st.markdown(f"<div class='score-item'><strong>Score {score} (Selected):</strong> {desc}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='score-item score-selected'>Score {score} (Selected): {desc}</div>", unsafe_allow_html=True)
             else:
                 st.markdown(f"<div class='score-item'><strong>Score {score}:</strong> {desc}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Instructions before submit button
+    st.markdown("---")
+    st.markdown("**Score your use case. Is it feasible? Are we targeting a working solution or prototype?**")
     
     # Submit button
     submitted = st.form_submit_button("Calculate Feasibility Score", type="primary", use_container_width=True)
@@ -365,7 +374,6 @@ if st.session_state.show_results:
 st.markdown("---")
 st.markdown("""
     <div style='text-align: center; color: #666; font-size: 0.9rem;'>
-        <p>Score your use case. Is it feasible? Are we targeting a working solution or prototype?</p>
         <p style='margin-top: 2rem;'>© ESTU Global 2025</p>
     </div>
 """, unsafe_allow_html=True)
