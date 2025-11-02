@@ -25,6 +25,10 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
+    .stAlert {
+        margin-bottom: 2rem !important;
+        font-size: 1rem !important;
+    }
     .dimension-title {
         font-size: 1.3rem;
         font-weight: bold;
@@ -85,6 +89,17 @@ if 'show_results' not in st.session_state:
 if 'scores' not in st.session_state:
     st.session_state.scores = {}
 
+# Assessment heading and instructions - outside the columns
+st.markdown("### Rate Each Dimension (1-5)")
+st.info("""
+**Score each dimension based on your project's current state.** 
+
+All scoring criteria are shown below each slider to guide your assessment. Select a score from 1-5 for each dimension, where:
+- **1 = Most challenging** (requires significant resources, learning, or preparation)
+- **3 = Moderate feasibility** (achievable with some effort and adaptation)  
+- **5 = Most feasible** (ready to implement with current resources and tools)
+""")
+
 # Create columns for the assessment
 col1, col2 = st.columns(2)
 
@@ -134,10 +149,6 @@ dimensions = {
 
 # Create the assessment form
 with st.form("assessment_form"):
-    st.markdown("### Rate Each Dimension (1-5)")
-    st.info("Score each dimension based on your project's current state. All scoring criteria are shown below each slider to guide your assessment.")
-    st.markdown("---")
-    
     scores = {}
     
     # Technical Feasibility
